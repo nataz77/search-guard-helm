@@ -18,18 +18,23 @@ data:
           do_not_fail_on_forbidden: {{ .Values.common.do_not_fail_on_forbidden }}
         http:
           xff:
-            enabled: false
+            enabled: true
+            internalProxies: '{{ .Values.common.proxy }}'
+            remoteIpHeader:  'x-forwarded-for'
+            proxiesHeader:   'x-forwarded-by'
         authc:
-          basic_internal_auth_domain: 
+          proxy_auth_domain:
             http_enabled: true
-            transport_enabled: false
+            transport_enabled: true
             order: 0
             http_authenticator:
-              type: basic
-              challenge: true
+              type: proxy
+              challenge: false
+              config:
+                user_header: "x-proxy-user"
+                roles_header: "x-proxy-roles"
             authentication_backend:
-              type: intern
-          
+              type: noop          
   sg_roles.yml: |-
     # Allows everything, but no changes to searchguard configuration index
     sg_all_access:
